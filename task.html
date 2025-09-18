@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TextFlow - Text Management App</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Global Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        :root {
+            --primary: #4361ee;
+            --secondary: #3a0ca3;
+            --accent: #f72585;
+            --dark: #2b2d42;
+            --light: #f8f9fa;
+            --success: #4cc9f0;
+            --warning: #f9c74f;
+        }
+        
+        body {
+            background-color: #f0f2f5;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Header Styles */
+        header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo i {
+            margin-right: 10px;
+            color: var(--accent);
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+        }
+        
+        nav ul li {
+            margin-left: 30px;
+        }
+        
+        nav ul li a {
+            text-decoration: none;
+            color: white;
+            font-weight: 500;
+            transition: color 0.3s;
+            font-size: 16px;
+        }
+        
+        nav ul li a:hover {
+            color: var(--accent);
+        }
+        
+        /* Hero Section */
+        .hero {
+            padding: 80px 0;
+            text-align: center;
+            background: linear-gradient(rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.9)), url('https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1200&q=80');
+            background-size: cover;
+            background-position: center;
+            margin-bottom: 40px;
+        }
+        
+        .hero h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+            color: var(--dark);
+        }
+        
+        .hero p {
+            font-size: 20px;
+            max-width: 700px;
+            margin: 0 auto 30px;
+            color: #555;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 12px 30px;
+            background-color: var(--accent);
+            color: white;
+            text-decoration: none;
+            border-radius: 30px;
+            font-weight: 600;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+        }
+        
+        .btn:hover {
+            background-color: #e5127d;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* App Interface */
+        .app-interface {
+            background-color: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.1);
+            margin-bottom: 60px;
+            display: flex;
+            min-height: 500px;
+        }
+        
+        .sidebar {
+            width: 250px;
+            background-color: var(--dark);
+            color: white;
+            padding: 20px;
+        }
+        
+        .sidebar h3 {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .sidebar h3 i {
+            margin-right: 10px;
+            color: var(--accent);
+        }
+        
+        .file-list {
+            list-style: none;
+        }
+        
+        .file-list li {
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            display: flex;
+            align-items: center;
+        }
+        
+        .file-list li:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .file-list li.active {
+            background-color: var(--primary);
+        }
+        
+        .file-list li i {
+            margin-right: 10px;
+        }
+        
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .toolbar {
+            padding: 15px 20px;
+            background-color: var(--light);
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .toolbar button {
+            background: none;
+            border: none;
+            font-size: 16px;
+            margin-right: 15px;
+            cursor: pointer;
+            color: #555;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .toolbar button:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+            color: var(--primary);
+        }
+        
+        .editor {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        .editor textarea {
+            width: 100%;
+            height: 100%;
+            border: none;
+            resize: none;
+            font-size: 16px;
+            line-height: 1.6;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .editor textarea:focus {
+            outline: none;
+        }
+        
+        .status-bar {
+            padding: 10px 20px;
+            background-color: var(--light);
+            display: flex;
+            justify-content: space-between;
+            color: #777;
+            font-size: 14px;
+            border-top: 1px solid #e0e0e0;
+        }
+        
+        /* Features Section */
+        .features {
+            margin-bottom: 60px;
+        }
+        
+        .section-title {
+            text-align: center;
+            margin-bottom: 40px;
+            font-size: 36px;
+            color: var(--dark);
+            position: relative;
+            padding-bottom: 15px;
+        }
+        
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 4px;
+            background-color: var(--accent);
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+        
+        .feature {
+            background-color: white;
+            border-radius: 10px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s;
+        }
+        
+        .feature:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .feature i {
+            font-size: 40px;
+            color: var(--primary);
+            margin-bottom: 20px;
+        }
+        
+        .feature h3 {
+            margin-bottom: 15px;
+            font-size: 22px;
+        }
+        
+        /* Testimonials */
+        .testimonials {
+            background-color: var(--dark);
+            color: white;
+            padding: 60px 0;
+            margin-bottom: 60px;
+        }
+        
+        .testimonials .section-title {
+            color: white;
+        }
+        
+        .testimonial-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+        }
+        
+        .testimonial {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 30px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .testimonial-text {
+            font-style: italic;
+            margin-bottom: 20px;
+        }
+        
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+        }
+        
+        .testimonial-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-weight: bold;
+        }
+        
+        /* CTA Section */
+        .cta {
+            text-align: center;
+            padding: 60px 0;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            border-radius: 10px;
+            margin-bottom: 60px;
+        }
+        
+        .cta h2 {
+            font-size: 36px;
+            margin-bottom: 20px;
+        }
+        
+        .cta p {
+            max-width: 600px;
+            margin: 0 auto 30px;
+            font-size: 18px;
+        }
+        
+        .btn-light {
+            background-color: white;
+            color: var(--primary);
+        }
+        
+        .btn-light:hover {
+            background-color: #f0f0f0;
+        }
+        
+        /* Footer */
+        footer {
+            background-color: var(--dark);
+            color: white;
+            padding: 60px 0 30px;
+        }
+        
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+        
+        .footer-column h3 {
+            margin-bottom: 20px;
+            font-size: 20px;
+            color: var(--accent);
+        }
+        
+        .footer-column p {
+            margin-bottom: 20px;
+            color: #bdc3c7;
+        }
+        
+        .footer-column ul {
+            list-style: none;
+        }
+        
+        .footer-column ul li {
+            margin-bottom: 10px;
+        }
+        
+        .footer-column ul li a {
+            color: #bdc3c7;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .footer-column ul li a:hover {
+            color: var(--accent);
+        }
+        
+        .social-links {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .social-links a {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+        
+        .social-links a:hover {
+            background-color: var(--primary);
+        }
+        
+        .copyright {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: #bdc3c7;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            nav ul {
+                margin-top: 20px;
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+            
+            nav ul li {
+                margin: 10px 15px;
+            }
+            
+            .hero h1 {
+                font-size: 36px;
+            }
+            
+            .hero p {
+                font-size: 18px;
+            }
+            
+            .app-interface {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                order: 2;
+            }
+            
+            .main-content {
+                order: 1;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .features-grid,
+            .testimonial-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .hero h1 {
+                font-size: 28px;
+            }
+            
+            .section-title {
+                font-size: 28px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-file-alt"></i>
+                    TextFlow
+                </div>
+                <nav>
+                    <ul>
+                        <li><a href="#">Home</a></li>
+                        <li><a href="#">Features</a></li>
+                        <li><a href="#">Pricing</a></li>
+                        <li><a href="#">Blog</a></li>
+                        <li><a href="#">Contact</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <h1>Manage Your Text with Ease</h1>
+            <p>TextFlow is a powerful yet simple text management application that helps you organize, edit, and analyze your documents efficiently.</p>
+            <a href="#" class="btn">Get Started for Free</a>
+        </div>
+    </section>
+
+    <!-- App Interface -->
+    <section class="container">
+        <div class="app-interface">
+            <div class="sidebar">
+                <h3><i class="fas fa-folder"></i> Documents</h3>
+                <ul class="file-list">
+                    <li class="active"><i class="fas fa-file-alt"></i> Project Plan.txt</li>
+                    <li><i class="fas fa-file-alt"></i> Meeting Notes.txt</li>
+                    <li><i class="fas fa-file-alt"></i> Ideas.txt</li>
+                    <li><i class="fas fa-file-alt"></i> To-Do List.txt</li>
+                    <li><i class="fas fa-file-alt"></i> Draft.txt</li>
+                </ul>
+            </div>
+            <div class="main-content">
+                <div class="toolbar">
+                    <button title="Bold"><i class="fas fa-bold"></i></button>
+                    <button title="Italic"><i class="fas fa-italic"></i></button>
+                    <button title="Underline"><i class="fas fa-underline"></i></button>
+                    <button title="Bullet List"><i class="fas fa-list-ul"></i></button>
+                    <button title="Numbered List"><i class="fas fa-list-ol"></i></button>
+                    <button title="Word Count"><i class="fas fa-font"></i></button>
+                    <button title="Find & Replace"><i class="fas fa-search"></i></button>
+                    <button title="Save"><i class="fas fa-save"></i></button>
+                </div>
+                <div class="editor">
+                    <textarea placeholder="Start typing your text here...">Project Plan - Website Redesign
+
+Objective:
+Redesign company website to improve user experience and increase conversion rates.
+
+Key Tasks:
+- Research competitor websites
+- Create wireframes for new layout
+- Develop responsive design
+- Implement content management system
+- Test across multiple devices
+- Launch new website
+
+Timeline: 6 weeks
+
+Team:
+- Project Manager: Sarah Johnson
+- Designer: Michael Chen
+- Developer: Alex Rodriguez
+- Content Writer: Jessica Williams
+
+Budget: $15,000</textarea>
+                </div>
+                <div class="status-bar">
+                    <div class="word-count">Words: 78 | Characters: 456</div>
+                    <div class="file-type">Plain Text</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features container">
+        <h2 class="section-title">Powerful Features</h2>
+        <div class="features-grid">
+            <div class="feature">
+                <i class="fas fa-edit"></i>
+                <h3>Rich Text Editing</h3>
+                <p>Format your text with bold, italics, underline, lists, and more. Customize your documents to fit your needs.</p>
+            </div>
+            <div class="feature">
+                <i class="fas fa-search"></i>
+                <h3>Advanced Search</h3>
+                <p>Quickly find text across all your documents with powerful search and replace functionality.</p>
+            </div>
+            <div class="feature">
+                <i class="fas fa-cloud"></i>
+                <h3>Cloud Sync</h3>
+                <p>Access your documents from anywhere with our secure cloud synchronization across all your devices.</p>
+            </div>
+            <div class="feature">
+                <i class="fas fa-lock"></i>
+                <h3>Secure Storage</h3>
+                <p>Your documents are encrypted and securely stored with regular backups to prevent data loss.</p>
+            </div>
+            <div class="feature">
+                <i class="fas fa-chart-pie"></i>
+                <h3>Text Analytics</h3>
+                <p>Get insights into your writing with word count, reading time, and readability statistics.</p>
+            </div>
+            <div class="feature">
+                <i class="fas fa-magic"></i>
+                <h3>AI Assistance</h3>
+                <p>Use our AI-powered tools to improve your writing, fix errors, and generate new content ideas.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section class="testimonials">
+        <div class="container">
+            <h2 class="section-title">What Users Say</h2>
+            <div class="testimonial-grid">
+                <div class="testimonial">
+                    <p class="testimonial-text">"TextFlow has completely transformed how I manage my writing projects. The organizational features are incredible!"</p>
+                    <div class="testimonial-author">
+                        <div class="testimonial-avatar">JD</div>
+                        <div>
+                            <strong>John Davis</strong>
+                            <div>Technical Writer</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial">
+                    <p class="testimonial-text">"As a student, TextFlow helps me keep all my notes organized and easily searchable. The word count feature is a lifesaver!"</p>
+                    <div class="testimonial-author">
+                        <div class="testimonial-avatar">SM</div>
+                        <div>
+                            <strong>Sarah Miller</strong>
+                            <div>Graduate Student</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial">
+                    <p class="testimonial-text">"The clean interface and powerful features make TextFlow perfect for my content creation workflow. Highly recommended!"</p>
+                    <div class="testimonial-author">
+                        <div class="testimonial-avatar">RK</div>
+                        <div>
+                            <strong>Robert Kim</strong>
+                            <div>Content Creator</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="container">
+        <div class="cta">
+            <h2>Ready to Improve Your Text Management?</h2>
+            <p>Join thousands of users who are already using TextFlow to organize their writing projects.</p>
+            <a href="#" class="btn btn-light">Sign Up Now</a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>TextFlow</h3>
+                    <p>A powerful text management application designed to help you create, organize, and analyze your documents efficiently.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+                <div class="footer-column">
+                    <h3>Product</h3>
+                    <ul>
+                        <li><a href="#">Features</a></li>
+                        <li><a href="#">Pricing</a></li>
+                        <li><a href="#">Use Cases</a></li>
+                        <li><a href="#">Testimonials</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Resources</h3>
+                    <ul>
+                        <li><a href="#">Blog</a></li>
+                        <li><a href="#">User Guides</a></li>
+                        <li><a href="#">Tutorials</a></li>
+                        <li><a href="#">Support</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Company</h3>
+                    <ul>
+                        <li><a href="#">About Us</a></li>
+                        <li><a href="#">Careers</a></li>
+                        <li><a href="#">Contact</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2023 TextFlow. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Simple JavaScript for interactive elements
+        document.addEventListener('DOMContentLoaded', function() {
+            // File list selection
+            const fileItems = document.querySelectorAll('.file-list li');
+            fileItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    fileItems.forEach(i => i.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Update editor content based on selection (simulated)
+                    const editor = document.querySelector('.editor textarea');
+                    if (this.textContent.includes('Meeting Notes')) {
+                        editor.value = "Meeting Notes - Project Update\n\nDate: June 15, 2023\nAttendees: Sarah, Michael, Alex, Jessica\n\nAgenda:\n- Review project timeline\n- Discuss design concepts\n- Assign development tasks\n- Content strategy update\n\nAction Items:\n- Michael to finalize wireframes by Friday\n- Alex to set up development environment\n- Jessica to create content outline\n- Sarah to schedule client review";
+                    } else if (this.textContent.includes('Ideas')) {
+                        editor.value = "Project Ideas\n\n1. Mobile app for text management\n2. Browser extension for quick notes\n3. Integration with popular cloud services\n4. Collaboration features for team editing\n5. Advanced text analytics dashboard\n6. Custom export formats (PDF, Word, HTML)";
+                    } else if (this.textContent.includes('To-Do')) {
+                        editor.value = "To-Do List\n\n[ ] Finalize project requirements\n[ ] Create initial design mockups\n[ ] Set up version control system\n[ ] Write project documentation\n[ ] Schedule team meeting\n[ ] Research competitor products\n\nCompleted:\n[X] Project kickoff meeting\n[X] Define project scope";
+                    } else {
+                        editor.value = "Project Plan - Website Redesign\n\nObjective:\nRedesign company website to improve user experience and increase conversion rates.\n\nKey Tasks:\n- Research competitor websites\n- Create wireframes for new layout\n- Develop responsive design\n- Implement content management system\n- Test across multiple devices\n- Launch new website\n\nTimeline: 6 weeks\n\nTeam:\n- Project Manager: Sarah Johnson\n- Designer: Michael Chen\n- Developer: Alex Rodriguez\n- Content Writer: Jessica Williams\n\nBudget: $15,000";
+                    }
+                });
+            });
+            
+            // Word count update
+            const editor = document.querySelector('.editor textarea');
+            const wordCount = document.querySelector('.word-count');
+            
+            editor.addEventListener('input', function() {
+                const text = this.value;
+                const words = text.trim() === '' ? 0 : text.trim().split(/\s+/).length;
+                const characters = text.length;
+                
+                wordCount.textContent = `Words: ${words} | Characters: ${characters}`;
+            });
+            
+            // Toolbar buttons
+            const toolbarButtons = document.querySelectorAll('.toolbar button');
+            toolbarButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    alert(`Feature: ${this.querySelector('i').parentNode.getAttribute('title')}\n\nThis functionality would be implemented in a fully developed application.`);
+                });
+            });
+        });
+    </script>
+</body>
+</html>
